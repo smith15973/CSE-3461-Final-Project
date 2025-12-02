@@ -18,7 +18,7 @@ def handleServerMessages(clientSocket: socket):
                 connectionOpen = False
                 break
 
-            print('From Server:', msg.decode())
+            print(msg.decode())
         except Exception as e:
             print(f"Connection error: {e}")
             connectionOpen = False
@@ -47,7 +47,7 @@ def main():
     clientSocket.connect((serverName,serverPort)) # initiates TCP connection . After this line is executed, three-way handshake is performed and a TCP connection is established
     localAddr = clientSocket.getsockname()
     print(f"Client connected from {localAddr[0]}:{localAddr[1]}")
-    
+
     t = Thread(target=handleServerMessages, args=(clientSocket,))
     t.start()
 

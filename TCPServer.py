@@ -24,14 +24,15 @@ def broadcast(sender: socket, msg:str):
 
 def handleClientWork(connectionSocket: socket):
     while True:   #always listening for messages
-        msg = connectionSocket.recv(1024) #receives 'string' from client
+        data = connectionSocket.recv(1024) #receives 'string' from client
 
-        if not msg:
+        if not data:
             connectionSocket.close()  #connection closes
             remove_client(connectionSocket)
             break
-
-        broadcast(connectionSocket, msg.decode())
+        sender_addr = connectionSocket.getpeername()
+        msg = f"\n{sender_addr[0]}:{sender_addr[1]} => {data.decode()}"
+        broadcast(connectionSocket, msg)
 
 def main():
     serverSocket = socket(AF_INET,SOCK_STREAM) #creating a server side socket
