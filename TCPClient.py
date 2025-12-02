@@ -45,8 +45,9 @@ def handleUserInput(clientSocket: socket):
 def main():
     clientSocket = socket(AF_INET, SOCK_STREAM) #creates client side TCP socket
     clientSocket.connect((serverName,serverPort)) # initiates TCP connection . After this line is executed, three-way handshake is performed and a TCP connection is established
-    addressInfo = clientSocket.recv(1024).decode() #receives 'string' from server, and decodes it first
-    print(addressInfo)
+    localAddr = clientSocket.getsockname()
+    print(f"Client connected from {localAddr[0]}:{localAddr[1]}")
+    
     t = Thread(target=handleServerMessages, args=(clientSocket,))
     t.start()
 

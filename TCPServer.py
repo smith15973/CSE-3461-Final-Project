@@ -42,7 +42,6 @@ def main():
     while True:   #always welcoming
         try:
             connectionSocket, addr = serverSocket.accept()  #create connection socket when client requests
-            connectionSocket.send(f"Address: {addr[0]}, Port: {addr[1]}".encode()) #send client address and port info
             
             with clients_lock:
                 clients.append(connectionSocket) #add client socket to list of clients
