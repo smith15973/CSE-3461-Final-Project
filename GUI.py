@@ -11,8 +11,14 @@ def add_message(msg: str, isUser: bool):
     # set wraplength to half of messages_frame's current width so the label uses ~50% of available width
     label.update_idletasks()
     label.config(wraplength=max(40, messages_frame.winfo_width() // 2))
+    
+
+def handleSendMessage():
     global user
+    add_message(entry.get(), user)
     user = not user
+    entry.delete(0, tk.END)
+
 
 root = tk.Tk()
 # set window size and center it on screen
@@ -36,7 +42,7 @@ input_row = ttk.Frame(root)
 input_row.pack(fill='x', padx=5, pady=5)
 
 entry = ttk.Entry(input_row)
-send_button = ttk.Button(input_row, text="Send", command=lambda: add_message(entry.get(), user))
+send_button = ttk.Button(input_row, text="Send", command=lambda: handleSendMessage())
 send_button.pack(side='right')
 entry.pack(side='left', fill='x', expand=True, padx=(5, 0))
 
