@@ -1,8 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
+from typing import Callable
 
 class ChatUI:
-    def __init__(self, width:int = 400, height:int = 400):
+    def __init__(self, on_send: Callable[[str], None], width:int = 400, height:int = 400):
         """
         Initialize the chat UI.
         
@@ -11,6 +12,7 @@ class ChatUI:
             height: Window height in pixels
         """
         self.message_labels: list[tk.Label] = []
+        self.on_send_callback = on_send
         self._create_window(width, height)
         self._create_ui()
 
@@ -62,7 +64,7 @@ class ChatUI:
         if message:
             self.add_message(message, isReceived=False)
             self.entry.delete(0, tk.END)
-
+            self.on_send_callback(message)
 
     # Make the frame expand to canvas width
     def _on_canvas_configure(self, event):

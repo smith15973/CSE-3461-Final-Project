@@ -31,7 +31,8 @@ def handleClientWork(connectionSocket: socket):
             remove_client(connectionSocket)
             break
         sender_addr = connectionSocket.getpeername()
-        msg = f"\n{sender_addr[0]}:{sender_addr[1]} => {data.decode()}"
+        msg = f"{sender_addr[0]}:{sender_addr[1]} => {data.decode()}"
+        # print("Received", msg)
         broadcast(connectionSocket, msg)
 
 def main():
