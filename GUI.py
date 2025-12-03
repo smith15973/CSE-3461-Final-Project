@@ -2,11 +2,13 @@ import tkinter as tk
 from tkinter import ttk
 
 user = False
+message_labels: list[tk.Label] = []
 
 def add_message(msg: str, isUser: bool):
     color = 'blue' if isUser else 'grey'
     anchor = 'e' if isUser else 'w'  # e=east (right), w=west (left)
     label = tk.Label(messages_frame, text=msg, background=color)
+    message_labels.append(label)
     label.pack(anchor=anchor, padx=5, pady=2)
     # set wraplength to half of messages_frame's current width so the label uses ~50% of available width
     label.update_idletasks()
@@ -50,6 +52,10 @@ canv_frame = canv.create_window((0, 0), window=messages_frame, anchor='nw')
 # Make the frame expand to canvas width
 def on_canvas_configure(event):
     canv.itemconfig(canv_frame, width=event.width)
+
+    #update messages to correct widths
+    for ml in message_labels:
+        ml.config(wraplength=max(40, messages_frame.winfo_width() * (3/5)))
 
 canv.bind('<Configure>', on_canvas_configure)
 
