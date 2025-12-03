@@ -4,15 +4,30 @@ from tkinter import ttk
 user = False
 message_labels: list[tk.Label] = []
 
-def add_message(msg: str, isUser: bool):
-    color = 'blue' if isUser else 'grey'
-    anchor = 'e' if isUser else 'w'  # e=east (right), w=west (left)
-    label = tk.Label(messages_frame, text=msg, background=color, padx=6, pady=5)
-    message_labels.append(label)
-    label.pack(anchor=anchor, padx=5, pady=3)
-    # set wraplength to half of messages_frame's current width so the label uses ~50% of available width
-    label.update_idletasks()
-    label.config(wraplength=max(40, messages_frame.winfo_width() * (3/5)))
+def add_message(msg: str, username: str = "Anonymous", isReceived: bool = True):
+    color = 'grey' if isReceived else 'blue'
+    anchor = 'w' if isReceived else 'e'  # w=west (left), e=east (right)
+
+
+    # create message container 3/5 of the window
+    message_container = tk.Frame(messages_frame, background='red')
+
+    # create user name label set to the left for received messages
+    if isReceived:
+        username_label = tk.Label(message_container, text=username, background='purple', height=1, font=('Arial', 7))
+        username_label.pack(side='top', anchor='w') #insert at top of container far left
+
+    # create message box label left grey for others, right blue for user
+    message_label = tk.Label(message_container, text=msg, background=color, pady=5)
+    
+    message_label.pack(anchor='w') #insert message into container
+    message_container.pack(anchor=anchor, padx=5, pady=3) #insert container onto messages frame
+
+    message_labels.append(message_label)
+    
+    # update current dimensions and resize message box
+    message_container.update_idletasks()
+    message_label.config(wraplength=max(40, messages_frame.winfo_width() * (3/5)))
 
     # Update the scroll region to include all content
     messages_frame.update_idletasks()
@@ -24,7 +39,7 @@ def add_message(msg: str, isUser: bool):
 
 def handleSendMessage():
     global user
-    add_message(entry.get(), user)
+    add_message(entry.get(), isReceived=user)
     user = not user
     entry.delete(0, tk.END)
 
@@ -89,7 +104,7 @@ entry.bind('<Return>', lambda e: handleSendMessage())
 # # ttk.Button(root, text="Quit", command=root.destroy).pack(pady=10)
 
 for i in range(20):
-    add_message('hello', i%2==0)
+    add_message('hello', isReceived=i%2==0)
 
 root.mainloop()
 
