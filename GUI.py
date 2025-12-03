@@ -7,9 +7,9 @@ message_labels: list[tk.Label] = []
 def add_message(msg: str, isUser: bool):
     color = 'blue' if isUser else 'grey'
     anchor = 'e' if isUser else 'w'  # e=east (right), w=west (left)
-    label = tk.Label(messages_frame, text=msg, background=color)
+    label = tk.Label(messages_frame, text=msg, background=color, padx=6, pady=5)
     message_labels.append(label)
-    label.pack(anchor=anchor, padx=5, pady=2)
+    label.pack(anchor=anchor, padx=5, pady=3)
     # set wraplength to half of messages_frame's current width so the label uses ~50% of available width
     label.update_idletasks()
     label.config(wraplength=max(40, messages_frame.winfo_width() * (3/5)))
@@ -38,6 +38,15 @@ x = (screen_w - width) // 2
 y = (screen_h - height) // 2
 root.geometry(f"{width}x{height}+{x}+{y}")
 
+# Set minimum window size to prevent input from disappearing
+root.minsize(400, 200)
+
+# Create input row FIRST (pack at bottom)
+input_row = ttk.Frame(root)
+input_row.pack(side='bottom', fill='x', padx=5, pady=5)
+input_row.pack_propagate(False)  # Prevent frame from shrinking
+input_row.config(height=30)  # Fixed height
+
 canv = tk.Canvas(root, bg='green', highlightthickness=0)
 ybar = tk.Scrollbar(root,command=canv.yview)
 canv.config(yscrollcommand=ybar.set)  
@@ -54,15 +63,16 @@ def on_canvas_configure(event):
     canv.itemconfig(canv_frame, width=event.width)
 
     #update messages to correct widths
+    new_label_width = messages_frame.winfo_width() * (3/5)
     for ml in message_labels:
-        ml.config(wraplength=max(40, messages_frame.winfo_width() * (3/5)))
+        ml.config(wraplength=max(40, new_label_width))
+    
+    # Update scroll region after reconfiguring
+    canv.update_idletasks()
+    canv.config(scrollregion=canv.bbox("all"))
 
 canv.bind('<Configure>', on_canvas_configure)
 
-
-# # Row 2: Another label and entry
-input_row = ttk.Frame(root)
-input_row.pack(fill='x', padx=5, pady=5)
 entry = ttk.Entry(input_row)
 entry.pack(side='left', fill='x', expand=True, padx=(0, 5))
 
