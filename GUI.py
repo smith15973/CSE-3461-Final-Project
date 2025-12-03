@@ -1,27 +1,26 @@
 import tkinter as tk
 from tkinter import ttk
 
-user = False
 message_labels: list[tk.Label] = []
 
 def add_message(msg: str, username: str = "Anonymous", isReceived: bool = True):
-    color = 'grey' if isReceived else 'blue'
+    color = '#808080' if isReceived else '#218AFF'
     anchor = 'w' if isReceived else 'e'  # w=west (left), e=east (right)
 
 
     # create message container 3/5 of the window
-    message_container = tk.Frame(messages_frame, background='red')
+    message_container = tk.Frame(messages_frame, padx=3)
 
     # create user name label set to the left for received messages
     if isReceived:
-        username_label = tk.Label(message_container, text=username, background='purple', height=1, font=('Arial', 7))
+        username_label = tk.Label(message_container, text=username, fg='grey', height=1, font=('Helvetica', 7), padx=0)
         username_label.pack(side='top', anchor='w') #insert at top of container far left
 
     # create message box label left grey for others, right blue for user
-    message_label = tk.Label(message_container, text=msg, background=color, pady=5)
+    message_label = tk.Label(message_container, text=msg, background=color, pady=5, font=("Helvetica", 10))
     
     message_label.pack(anchor='w') #insert message into container
-    message_container.pack(anchor=anchor, padx=5, pady=3) #insert container onto messages frame
+    message_container.pack(anchor=anchor, pady=3) #insert container onto messages frame
 
     message_labels.append(message_label)
     
@@ -38,9 +37,7 @@ def add_message(msg: str, username: str = "Anonymous", isReceived: bool = True):
     
 
 def handleSendMessage():
-    global user
-    add_message(entry.get(), isReceived=user)
-    user = not user
+    add_message(entry.get(), isReceived=False)
     entry.delete(0, tk.END)
 
 
@@ -62,7 +59,7 @@ input_row.pack(side='bottom', fill='x', padx=5, pady=5)
 input_row.pack_propagate(False)  # Prevent frame from shrinking
 input_row.config(height=30)  # Fixed height
 
-canv = tk.Canvas(root, bg='green', highlightthickness=0)
+canv = tk.Canvas(root, highlightthickness=0)
 ybar = tk.Scrollbar(root,command=canv.yview)
 canv.config(yscrollcommand=ybar.set)  
 
@@ -70,7 +67,7 @@ ybar.pack(side='right', fill='y')
 canv.pack(side='top', expand=True, fill='both')
           
 
-messages_frame = tk.Frame(canv, background='yellow')
+messages_frame = tk.Frame(canv, padx=10, pady=3)
 canv_frame = canv.create_window((0, 0), window=messages_frame, anchor='nw')
 
 # Make the frame expand to canvas width
@@ -97,14 +94,6 @@ send_button.pack(side='right')
 
 # Bind Enter key to send message
 entry.bind('<Return>', lambda e: handleSendMessage())
-
-
-
-# # Row 3: Button centered
-# # ttk.Button(root, text="Quit", command=root.destroy).pack(pady=10)
-
-for i in range(20):
-    add_message('hello', isReceived=i%2==0)
 
 root.mainloop()
 
