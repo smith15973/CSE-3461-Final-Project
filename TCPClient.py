@@ -23,7 +23,8 @@ def handleServerMessages():
                 break
 
             # print("Received", msg.decode())
-            chat.add_message(msg.decode())
+            username, message = msg.decode().split('=>')
+            chat.add_message(message.strip(), username=username.strip())
         except Exception as e:
             print(f"Connection error: {e}")
             connectionOpen = False
