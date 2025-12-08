@@ -5,12 +5,24 @@ serverPort = 12000
 clients: list[socket] = []
 clients_lock = threading.Lock()
 
+def broadcast_connected_users():
+    with clients_lock: 
+        clients_copy = list(clients)
+    clients_string = ''
+    for i, client in enumerate(clients_copy):
+        ip, port = client.getpeername()
+        clients_string += f"{ip}:{port}"
+        if i < len(clients_copy) - 1:
+            clients_string += ", "
+    broadcast(f"USERLIST|{clients_string}")
+
 def remove_client(client:socket):
     with clients_lock:
         if client in clients:  # avoid KeyError
             clients.remove(client)
+    broadcast_connected_users()
 
-def broadcast(sender: socket, msg:str):
+def broadcast(msg:str, sender: socket = None,):
     with clients_lock: 
         clients_copy = list(clients)
     for client in clients_copy:
@@ -37,7 +49,7 @@ def handleClientWork(connectionSocket: socket):
         username = f"{sender_addr[0]}:{sender_addr[1]}"
         msg = f"GROUP|{username}|{data}"
         # print("Received", msg)
-        broadcast(connectionSocket, msg)
+        broadcast(msg, sender=connectionSocket)
 
 def main():
     serverSocket = socket(AF_INET,SOCK_STREAM) #creating a server side socket
@@ -54,6 +66,8 @@ def main():
 
             t = threading.Thread(target=handleClientWork, args=(connectionSocket,)) #create thread for client
             t.start() # start client thread
+            broadcast_connected_users()
+
         except KeyboardInterrupt:
             print("\nShutting down Server")
             break
