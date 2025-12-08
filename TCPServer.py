@@ -34,7 +34,8 @@ def handleClientWork(connectionSocket: socket):
             remove_client(connectionSocket)
             break
         sender_addr = connectionSocket.getpeername()
-        msg = f"{sender_addr[0]}:{sender_addr[1]} => {data}"
+        username = f"{sender_addr[0]}:{sender_addr[1]}"
+        msg = f"GROUP|{username}|{data}"
         # print("Received", msg)
         broadcast(connectionSocket, msg)
 

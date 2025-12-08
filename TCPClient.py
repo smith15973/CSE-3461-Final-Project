@@ -1,6 +1,7 @@
 from socket import *
 from threading import Thread
 import sys
+from typing import List
 from ChatUI import ChatUI 
 import message_protocol
 
@@ -9,6 +10,7 @@ serverPort = 12000 #un-reserved port #
 clientSocket: socket
 connectionOpen = False
 chat: ChatUI
+connected_users: List[str] = []
 
 def handleServerMessages():
     global connectionOpen, chat, clientSocket
@@ -24,8 +26,28 @@ def handleServerMessages():
                 break
 
             # print("Received", msg.decode())
-            username, message = msg.split('=>')
-            chat.add_message(message.strip(), username=username.strip())
+            parts = msg.split('|', 2)
+
+            if len(parts) < 2:
+                continue
+
+            messageType = parts[0]
+            match messageType:
+                case "GROUP":
+                    sender = parts[1].strip()
+                    message = parts[2] if len(parts) > 2 else ""
+                    chat.add_message(message, username=sender)
+                case "DIRECT":
+                    sender = parts[1].strip()
+                    message = parts[2] if len(parts) > 2 else ""
+                    chat.add_message(message, username=sender)
+                case "USERLIST":
+                    user_string = parts[1]
+                    connected_users = user_string.split(',') if user_string else []
+                    print(f"Connected users: {', '.join(connected_users)}")
+                case _:
+                    continue
+            
         except Exception as e:
             print(f"Connection error: {e}")
             connectionOpen = False
