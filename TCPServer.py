@@ -1,5 +1,6 @@
 from socket import * 
 import threading
+import message_protocol
 serverPort = 12000 
 clients: list[socket] = []
 clients_lock = threading.Lock()
@@ -16,7 +17,8 @@ def broadcast(sender: socket, msg:str):
         if client is sender:
                 continue
         try:
-            client.send(msg.encode())
+            # client.send(msg.encode())
+            message_protocol.send_message(client, msg)
         except OSError:
             # socket is dead → remove it safely
             remove_client(client)
@@ -24,14 +26,15 @@ def broadcast(sender: socket, msg:str):
 
 def handleClientWork(connectionSocket: socket):
     while True:   #always listening for messages
-        data = connectionSocket.recv(1024) #receives 'string' from client
+        # data = connectionSocket.recv(1024) #receives 'string' from client
+        data = message_protocol.recv_message(connectionSocket)
 
         if not data:
             connectionSocket.close()  #connection closes
             remove_client(connectionSocket)
             break
         sender_addr = connectionSocket.getpeername()
-        msg = f"{sender_addr[0]}:{sender_addr[1]} => {data.decode()}"
+        msg = f"{sender_addr[0]}:{sender_addr[1]} => {data}"
         # print("Received", msg)
         broadcast(connectionSocket, msg)
 

@@ -2,6 +2,7 @@ from socket import *
 from threading import Thread
 import sys
 from ChatUI import ChatUI 
+import message_protocol
 
 serverName = "127.0.0.1" #or local host "127.0.0.1"#"192.168.1.2"#'hostname'#server's IP address (precisely IPv4)'servername'
 serverPort = 12000 #un-reserved port #
@@ -13,7 +14,7 @@ def handleServerMessages():
     global connectionOpen, chat, clientSocket
     while True:   #always listening for messages
         try:
-            msg = clientSocket.recv(1024) #receives 'string' from server
+            msg = message_protocol.recv_message(clientSocket)
 
             if not msg:
                 clientSocket.close()  #connection closes
@@ -23,7 +24,7 @@ def handleServerMessages():
                 break
 
             # print("Received", msg.decode())
-            username, message = msg.decode().split('=>')
+            username, message = msg.split('=>')
             chat.add_message(message.strip(), username=username.strip())
         except Exception as e:
             print(f"Connection error: {e}")
@@ -40,7 +41,7 @@ def send_message_to_server(message:str):
         return
     # print("SENDING TO SERVER", message)
     try:        
-        clientSocket.send(message.encode()) # this line encodes and sends the string 
+        message_protocol.send_message(clientSocket, message)
     except KeyboardInterrupt:
         print("\nClient shutting down...")
         chat.destroy()
