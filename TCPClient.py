@@ -125,7 +125,8 @@ def main():
 
         # Get local address info
         localAddr = clientSocket.getsockname()
-        full_username = f"{username} ({localAddr[0]}:{localAddr[1]})"
+        # full_username = f"{username}({localAddr[0]}:{localAddr[1]})"
+        full_username = username
 
         # Send username to server
         message_protocol.send_message(clientSocket, f"USERNAME|{full_username}")
