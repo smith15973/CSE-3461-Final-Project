@@ -91,8 +91,12 @@ def main():
         clientSocket = socket(AF_INET, SOCK_STREAM) #creates client side TCP socket
         clientSocket.connect((server, port)) # initiates TCP connection
         connectionOpen = True
+
         localAddr = clientSocket.getsockname()
-        print(f"Client connected from {localAddr[0]}:{localAddr[1]}")
+        username = f"{username} ({localAddr[0]}:{localAddr[1]})"
+
+        message_protocol.send_message(clientSocket, f"USERNAME|{username}")
+        print(f"Connected to {server}:{port} as '{username}'")
         
         chat = ChatUI(send_message_to_server)
         t = Thread(target=handleServerMessages, daemon=True)

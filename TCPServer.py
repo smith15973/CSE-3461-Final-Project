@@ -37,6 +37,42 @@ def broadcast(msg:str, sender: socket = None,):
             client.close()
 
 def handleClientWork(connectionSocket: socket):
+
+    try:
+        message = message_protocol.recv_message(connectionSocket)
+
+        # Handle connection closed
+        if message is None:
+            print("Connection closed")
+            connectionSocket.close()
+            return  # or continue, depending on your loop structure
+
+        # Validate message format
+        parts = message.split('|')
+        if len(parts) != 2:
+            print(f"Invalid message format: {message}")
+            connectionSocket.close()
+            return
+
+        msgType, username = parts
+        if msgType != "USERNAME" or not username:
+            connectionSocket.close()
+            return
+    
+        # Add client to dictionary
+        # with clients_lock:
+        #     clients[connectionSocket] = username
+        
+        print(f"{username} connected")
+        
+        # Send updated user list to all clients
+        broadcast_connected_users()
+        
+    except Exception as e:
+        print(f"Error during client setup: {e}")
+        connectionSocket.close()
+        return
+
     while True:   #always listening for messages
         # data = connectionSocket.recv(1024) #receives 'string' from client
         data = message_protocol.recv_message(connectionSocket)
