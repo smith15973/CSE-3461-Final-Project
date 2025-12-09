@@ -10,6 +10,7 @@ serverPort = 12000 #un-reserved port #
 clientSocket: socket
 connectionOpen = False
 chat: ChatUI
+username: str = None
 connected_users: List[str] = []
 
 def handleServerMessages():
@@ -71,10 +72,24 @@ def send_message_to_server(message:str):
 
 
 def main():
-    global chat, clientSocket, connectionOpen
+    global chat, clientSocket, connectionOpen, username
+
+    # Get server connection info
+    server_input = input(f"Enter server address (default {serverName}): ").strip()
+    server = server_input if server_input else serverName
+    
+    port_input = input(f"Enter server port (default {serverPort}): ").strip()
+    port = int(port_input) if port_input else serverPort
+    
+    # Get username from user
+    username = input("Enter your username: ").strip()
+    if not username:
+        print("Username cannot be empty")
+        return
+    
     try:
         clientSocket = socket(AF_INET, SOCK_STREAM) #creates client side TCP socket
-        clientSocket.connect((serverName,serverPort)) # initiates TCP connection
+        clientSocket.connect((server, port)) # initiates TCP connection
         connectionOpen = True
         localAddr = clientSocket.getsockname()
         print(f"Client connected from {localAddr[0]}:{localAddr[1]}")

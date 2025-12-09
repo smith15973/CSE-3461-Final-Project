@@ -52,10 +52,15 @@ def handleClientWork(connectionSocket: socket):
         broadcast(msg, sender=connectionSocket)
 
 def main():
+    # Get port from user
+    port_input = input("Enter port number to start server on (default 12000): ").strip()
+    port = int(port_input) if port_input else serverPort
+
     serverSocket = socket(AF_INET,SOCK_STREAM) #creating a server side socket
-    serverSocket.bind(('',serverPort))  # bind() method associates a server socket with a specific address and port on the local machine
+    serverSocket.bind(('', port))  # bind() method associates a server socket with a specific address and port on the local machine
     serverSocket.listen() #this line means server listens for the TCP connection req. 
-    print('The server is ready to receive')  # printing to confirm that TCP server is up and ready
+    
+    print(f'Server is ready to receive on port {port}')
 
     while True:   #always welcoming
         try:
